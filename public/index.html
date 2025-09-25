@@ -9,8 +9,27 @@
 </head>
 
 <body>
-  <main>
+  <main style="position: relative; width: 100%; height: 100vh;">
     <div id="map" style="height: 100%; width: 100%;"></div>
+    <!-- 現在地に飛ぶボタン -->
+  <button id="goto-current-location" title="現在地に移動" style="position: absolute; top: 100px; right: 12px; z-index: 1200; width: 40px; height: 40px; border-radius: 50%; background: #90caf9; color: #1976d2; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.18); font-size: 1.2em; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+      <span style="pointer-events: none;">📍</span>
+    </button>
+    <!-- 地図の上に重ねる目的地入力フォーム -->
+    <form id="destination-form" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 1em 2em; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; display: flex; align-items: center; gap: 1em;">
+      <input type="text" id="destination-input" name="destination" placeholder="目的地を入力してください" style="width: 220px; padding: 0.5em;">
+      <button type="submit" style="padding: 0.5em 1.5em; min-width: 100px;">検索</button>
+    </form>
+    <!-- 出発地入力画面（初期は非表示） -->
+    <div id="origin-modal" style="display: none; position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.98); padding: 2em 2em; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 1100; min-width: 320px;">
+      <form id="origin-form" style="display: flex; flex-direction: column; gap: 1em; align-items: center;">
+        <input type="text" id="origin-input" name="origin" placeholder="出発地を入力してください" style="width: 220px; padding: 0.5em;">
+        <div style="display: flex; gap: 1em;">
+          <button type="submit" style="padding: 0.5em 1.5em; min-width: 100px;">決定</button>
+          <button type="button" id="origin-cancel" style="padding: 0.5em 1em;">キャンセル</button>
+        </div>
+      </form>
+    </div>
   </main>
   <script type="module" src="bundle.js"></script>
 </body>
