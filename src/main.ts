@@ -117,19 +117,24 @@ window.onload = () => {
   // ルート設定ボタンの機能
   const openRouteModalBtn = document.getElementById('open-route-modal');
   const routeModal = document.getElementById('route-modal') as HTMLDivElement;
-  const routeCancel = document.getElementById('route-cancel') as HTMLButtonElement;
   const routeForm = document.getElementById('route-form') as HTMLFormElement;
   const originInput = document.getElementById('origin-input') as HTMLInputElement;
   const destinationInput = document.getElementById('destination-input') as HTMLInputElement;
 
-  if (openRouteModalBtn && routeModal && routeCancel && routeForm && originInput && destinationInput) {
+  if (openRouteModalBtn && routeModal && routeForm && originInput && destinationInput) {
     openRouteModalBtn.addEventListener('click', () => {
       routeModal.style.display = 'block';
       originInput.value = '';
       destinationInput.value = '';
     });
-    routeCancel.addEventListener('click', () => {
-      routeModal.style.display = 'none';
+    // 枠の外側クリックで閉じる
+    document.addEventListener('mousedown', (e) => {
+      if (routeModal.style.display === 'block') {
+        const target = e.target as HTMLElement;
+        if (routeModal && !routeModal.contains(target) && target !== openRouteModalBtn) {
+          routeModal.style.display = 'none';
+        }
+      }
     });
     routeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
