@@ -17,8 +17,13 @@
     </button>
     <!-- 地図の上に重ねる目的地入力フォーム -->
     <form id="destination-form" style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); padding: 1em 2em; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 1000; display: flex; align-items: center; gap: 1em;">
-      <input type="text" id="destination-input" name="destination" placeholder="目的地を入力してください" style="width: 220px; padding: 0.5em;">
-      <button type="submit" style="padding: 0.5em 1.5em; min-width: 100px;">検索</button>
+      <input type="text" id="destination-input" name="destination" placeholder="目的地を入力してください" style="width: 160px; padding: 0.5em;">
+      <div id="search-options" style="display: none; flex-direction: row; justify-content: center; gap: 1em; width: auto; margin-top: 0.5em; max-width: 90vw; overflow-x: auto;">
+        <label style="font-size: 0.8em; white-space: nowrap;"><input type="checkbox" id="avoid-hill" name="avoidHill">坂回避</label>
+        <label style="font-size: 0.8em; white-space: nowrap;"><input type="checkbox" id="avoid-stairs" name="avoidStairs">階段回避</label>
+        <label style="font-size: 0.8em; white-space: nowrap;"><input type="checkbox" id="avoid-flood" name="avoidFlood">水害回避</label>
+      </div>
+      <button type="submit" style="padding: 0.5em 1em; min-width: 80px; font-size: 0.95em;">検索</button>
     </form>
     <!-- 出発地入力画面（初期は非表示） -->
     <div id="origin-modal" style="display: none; position: absolute; top: 80px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.98); padding: 2em 2em; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 1100; min-width: 320px;">
