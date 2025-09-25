@@ -2,9 +2,11 @@
 
 import L from 'leaflet';
 
-// BRouter APIのURL生成
-function getBRouterUrl(start: number[], end: number[]): string {
-  return `https://brouter.de/brouter?lonlats=${start[1]},${start[0]}|${end[1]},${end[0]}&profile=fastbike&alternativeidx=0&format=geojson`;
+// BRouter APIのURL生成（坂道回避オプション追加）
+function getBRouterUrl(start: number[], end: number[], avoidHills: boolean): string {
+  // profile: shortest（通常）/ trekking（坂道回避）
+  const profile = avoidHills ? 'trekking' : 'shortest';
+  return `https://brouter.de/brouter?lonlats=${start[1]},${start[0]}|${end[1]},${end[0]}&profile=${profile}&alternativeidx=0&format=geojson`;
 }
 
 // MLIT 浸水マップタイルURL（全国洪水浸水想定区域図ラスタ例）
@@ -120,12 +122,14 @@ window.onload = () => {
   const routeForm = document.getElementById('route-form') as HTMLFormElement;
   const originInput = document.getElementById('origin-input') as HTMLInputElement;
   const destinationInput = document.getElementById('destination-input') as HTMLInputElement;
+  const avoidHillsInput = document.getElementById('avoid-hills') as HTMLInputElement;
 
-  if (openRouteModalBtn && routeModal && routeForm && originInput && destinationInput) {
+  if (openRouteModalBtn && routeModal && routeForm && originInput && destinationInput && avoidHillsInput) {
     openRouteModalBtn.addEventListener('click', () => {
       routeModal.style.display = 'block';
       originInput.value = '';
       destinationInput.value = '';
+      avoidHillsInput.checked = false;
     });
     // 枠の外側クリックで閉じる
     document.addEventListener('mousedown', (e) => {
@@ -141,6 +145,7 @@ window.onload = () => {
       routeModal.style.display = 'none';
       const originText = originInput.value.trim();
       const destinationText = destinationInput.value.trim();
+      const avoidHills = avoidHillsInput.checked;
       if (!originText || !destinationText) {
         alert('出発地と目的地を入力してください');
         return;
@@ -168,9 +173,9 @@ window.onload = () => {
         originLatLng as L.LatLngTuple,
         destinationLatLng as L.LatLngTuple
       ]);
-      // BRouter APIでルート取得
+      // BRouter APIでルート取得（坂道回避オプションを反映）
       try {
-        const url = getBRouterUrl(originLatLng, destinationLatLng);
+        const url = getBRouterUrl(originLatLng, destinationLatLng, avoidHills);
         const res = await fetch(url);
         if (!res.ok) throw new Error('ルート取得失敗');
         const geojson = await res.json();

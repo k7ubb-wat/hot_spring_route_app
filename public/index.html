@@ -27,11 +27,16 @@
       <form id="route-form" style="display: flex; flex-direction: column; gap: 1em; align-items: center;">
         <input type="text" id="origin-input" name="origin" placeholder="出発地を入力してください" style="width: 220px; padding: 0.5em;">
         <input type="text" id="destination-input" name="destination" placeholder="目的地を入力してください" style="width: 220px; padding: 0.5em;">
+        <label style="display: flex; align-items: center; gap: 0.5em;">
+          <input type="checkbox" id="avoid-hills" name="avoid-hills">
+          坂道回避ルート
+        </label>
         <div style="display: flex; gap: 1em;">
           <button type="submit" style="padding: 0.5em 1.5em; min-width: 100px;">検索</button>
         </div>
       </form>
     </div>
+   
   </main>
   <script type="module" src="bundle.js"></script>
 </body>
