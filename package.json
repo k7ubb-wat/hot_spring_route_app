@@ -1,0 +1,24 @@
+{
+	"name": "your-project-name",
+	"version": "1.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "concurrently \"npm run watch\" \"npm run serve\"",
+		"serve": "http-server dist -p 3000 -a localhost",
+		"watch": "node build.js --dev",
+		"build": "node build.js",
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.36.0",
+		"@types/node": "^24.5.2",
+		"concurrently": "^9.2.1",
+		"esbuild": "^0.25.10",
+		"eslint": "^9.36.0",
+		"fs-extra": "^11.3.2",
+		"globals": "^16.4.0",
+		"http-server": "^14.1.1",
+		"typescript": "^5.9.2"
+	}
+}
