@@ -2,55 +2,57 @@
 
 import L from 'leaflet';
 
-// 王子駅・飛鳥山動物病院の緯度経度
-const OJI = [35.755532, 139.733945];
-const ASUKAYAMA_ANIMAL_HOSPITAL = [35.751824, 139.736013]; // 飛鳥山動物病院
-
 // BRouter APIのURL生成
 function getBRouterUrl(start: number[], end: number[]): string {
   return `https://brouter.de/brouter?lonlats=${start[1]},${start[0]}|${end[1]},${end[0]}&profile=fastbike&alternativeidx=0&format=geojson`;
 }
 
-window.onload = async () => {
-  
 // MLIT 浸水マップタイルURL（全国洪水浸水想定区域図ラスタ例）
 const floodTileUrl = 'https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png';
 
 let floodLayer: L.TileLayer | null = null;
 let isFloodMap = false;
 
+// カスタムアイコン（緑：出発地、赤：目的地）
+const greenIcon = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+const redIcon = L.icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 
-  // ...existing code...
-  // ピンとルートの管理用
-  let lastMarkers: L.Marker[] = [];
-  let lastRouteLayer: L.Layer | null = null;
-  // 検索ボタン（目的地フォーム）のsubmitでページ遷移しないように
-  const destinationForm = document.getElementById('destination-form') as HTMLFormElement;
-  if (destinationForm) {
-    destinationForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-    });
+// ピンとルートの管理用
+let lastMarkers: L.Marker[] = [];
+let lastRouteLayer: L.Layer | null = null;
+
+// Nominatimで住所から緯度経度を取得
+async function getLatLngByNominatim(query: string): Promise<[number, number] | null> {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
+  try {
+    const res = await fetch(url, { headers: { 'Accept-Language': 'ja' } });
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.length === 0) return null;
+    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+  } catch {
+    return null;
   }
-  // Nominatimで住所から緯度経度を取得
-  async function getLatLngByNominatim(query: string): Promise<[number, number] | null> {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
-    try {
-      const res = await fetch(url, { headers: { 'Accept-Language': 'ja' } });
-      if (!res.ok) return null;
-      const data = await res.json();
-      if (data.length === 0) return null;
-      return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-    } catch {
-      return null;
-    }
-  }
+}
+
+window.onload = () => {
   const map = L.map('map').setView([35.755532, 139.733945], 16);
-  // const map = L.map('map').setView([
-  //   (OJI[0] + ASUKAYAMA_ANIMAL_HOSPITAL[0]) / 2,
-  //   (OJI[1] + ASUKAYAMA_ANIMAL_HOSPITAL[1]) / 2
-  // ], 16);
 
-// 通常地図レイヤー
+  // 通常地図レイヤー
   const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
@@ -97,7 +99,6 @@ let isFloodMap = false;
     });
   }
 
-
   // 浸水マップ切替ボタンの機能
   const floodBtn = document.getElementById('toggle-flood-map');
   if (floodBtn) {
@@ -112,46 +113,29 @@ let isFloodMap = false;
       }
     });
   }
-  // 目的地入力ボックスをクリックしたら出発地入力画面を表示
-  const destinationInput = document.getElementById('destination-input') as HTMLInputElement;
-  const searchOptions = document.getElementById('search-options');
-  if (destinationInput && searchOptions) {
-    destinationInput.addEventListener('focus', () => {
-      searchOptions.style.display = 'flex';
-    });
-    destinationInput.addEventListener('blur', () => {
-      setTimeout(() => {
-        // チェックボックスやボタンをクリックした場合も考慮
-        if (document.activeElement && (document.activeElement as HTMLElement).closest('#search-options')) {
-          return;
-        }
-        searchOptions.style.display = 'none';
-      }, 150);
-    });
-    searchOptions.addEventListener('mousedown', (e) => {
-      // チェックボックスクリック時は非表示にしない
-      e.preventDefault();
-    });
-  }
-  const originModal = document.getElementById('origin-modal') as HTMLDivElement;
-  const originCancel = document.getElementById('origin-cancel') as HTMLButtonElement;
 
-  if (destinationInput && originModal && originCancel) {
-    destinationInput.addEventListener('focus', () => {
-      originModal.style.display = 'block';
+  // ルート設定ボタンの機能
+  const openRouteModalBtn = document.getElementById('open-route-modal');
+  const routeModal = document.getElementById('route-modal') as HTMLDivElement;
+  const routeCancel = document.getElementById('route-cancel') as HTMLButtonElement;
+  const routeForm = document.getElementById('route-form') as HTMLFormElement;
+  const originInput = document.getElementById('origin-input') as HTMLInputElement;
+  const destinationInput = document.getElementById('destination-input') as HTMLInputElement;
+
+  if (openRouteModalBtn && routeModal && routeCancel && routeForm && originInput && destinationInput) {
+    openRouteModalBtn.addEventListener('click', () => {
+      routeModal.style.display = 'block';
+      originInput.value = '';
+      destinationInput.value = '';
     });
-    originCancel.addEventListener('click', () => {
-      originModal.style.display = 'none';
+    routeCancel.addEventListener('click', () => {
+      routeModal.style.display = 'none';
     });
-    // 決定ボタンで閉じる（必要なら値の取得もここで）
-    const originForm = document.getElementById('origin-form') as HTMLFormElement;
-    originForm?.addEventListener('submit', async (e) => {
+    routeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      originModal.style.display = 'none';
-      // 出発地・目的地の値取得
-      const originInput = document.getElementById('origin-input') as HTMLInputElement;
-      const originText = originInput?.value || '';
-      const destinationText = destinationInput?.value || '';
+      routeModal.style.display = 'none';
+      const originText = originInput.value.trim();
+      const destinationText = destinationInput.value.trim();
       if (!originText || !destinationText) {
         alert('出発地と目的地を入力してください');
         return;
@@ -170,18 +154,15 @@ let isFloodMap = false;
         map.removeLayer(lastRouteLayer);
         lastRouteLayer = null;
       }
-
-      // 地図にマーカー表示
-      const originMarker = L.marker(originLatLng as L.LatLngTuple).addTo(map).bindPopup('出発地').openPopup();
-      const destinationMarker = L.marker(destinationLatLng as L.LatLngTuple).addTo(map).bindPopup('目的地').openPopup();
+      // 地図にマーカー表示（色付きアイコンを使用）
+      const originMarker = L.marker(originLatLng as L.LatLngTuple, { icon: greenIcon }).addTo(map).bindPopup('出発地').openPopup();
+      const destinationMarker = L.marker(destinationLatLng as L.LatLngTuple, { icon: redIcon }).addTo(map).bindPopup('目的地').openPopup();
       lastMarkers.push(originMarker, destinationMarker);
       // ルート全体が表示されるように地図の表示範囲を調整
       const bounds = L.latLngBounds([
         originLatLng as L.LatLngTuple,
         destinationLatLng as L.LatLngTuple
       ]);
-
-
       // BRouter APIでルート取得
       try {
         const url = getBRouterUrl(originLatLng, destinationLatLng);
@@ -209,28 +190,4 @@ let isFloodMap = false;
       }
     });
   }
-
-  // // 王子駅・飛鳥山動物病院にマーカーを表示
-  // L.marker(OJI as L.LatLngTuple).addTo(map).bindPopup('王子駅').openPopup();
-  // L.marker(ASUKAYAMA_ANIMAL_HOSPITAL as L.LatLngTuple).addTo(map).bindPopup('飛鳥山動物病院');
-
-  // // BRouter APIでルート取得
-  // try {
-  //   const url = getBRouterUrl(OJI, ASUKAYAMA_ANIMAL_HOSPITAL);
-  //   const res = await fetch(url);
-  //   if (!res.ok) throw new Error('ルート取得失敗');
-  //   const geojson = await res.json();
-
-  //   // GeoJSONのルートを地図に表示
-  //   L.geoJSON(geojson, {
-  //     style: {
-  //       color: 'blue',
-  //       weight: 5,
-  //       opacity: 0.7
-  //     }
-  //   }).addTo(map);
-  // } catch (e) {
-  //   alert('ルートの取得に失敗しました');
-  //   console.error(e);
-  // }
 };
