@@ -12,6 +12,14 @@ function getBRouterUrl(start: number[], end: number[]): string {
 }
 
 window.onload = async () => {
+  
+// MLIT 浸水マップタイルURL（全国洪水浸水想定区域図ラスタ例）
+const floodTileUrl = 'https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/{z}/{x}/{y}.png';
+
+let floodLayer: L.TileLayer | null = null;
+let isFloodMap = false;
+
+
   // ...existing code...
   // ピンとルートの管理用
   let lastMarkers: L.Marker[] = [];
@@ -42,9 +50,16 @@ window.onload = async () => {
   //   (OJI[1] + ASUKAYAMA_ANIMAL_HOSPITAL[1]) / 2
   // ], 16);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// 通常地図レイヤー
+  const baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
+
+  // 浸水マップレイヤー（初期は非表示）
+  floodLayer = L.tileLayer(floodTileUrl, {
+    opacity: 0.7,
+    attribution: '国土交通省 浸水マップ'
+  });
 
   // 現在地ピン管理用
   let currentLocationMarker: L.Marker | null = null;
@@ -82,6 +97,21 @@ window.onload = async () => {
     });
   }
 
+
+  // 浸水マップ切替ボタンの機能
+  const floodBtn = document.getElementById('toggle-flood-map');
+  if (floodBtn) {
+    floodBtn.addEventListener('click', () => {
+      if (isFloodMap) {
+        map.removeLayer(floodLayer!);
+        baseLayer.addTo(map);
+        isFloodMap = false;
+      } else {
+        map.addLayer(floodLayer!);
+        isFloodMap = true;
+      }
+    });
+  }
   // 目的地入力ボックスをクリックしたら出発地入力画面を表示
   const destinationInput = document.getElementById('destination-input') as HTMLInputElement;
   const searchOptions = document.getElementById('search-options');
