@@ -2,8 +2,20 @@
 
 import L from 'leaflet';
 
-window.onload = () => {
-  const map = L.map('map').setView([35.681236, 139.767125], 13); // 東京駅周辺
+// 王子駅・飛鳥山動物病院の緯度経度
+const OJI = [35.755532, 139.733945];
+const ASUKAYAMA_ANIMAL_HOSPITAL = [35.751824, 139.736013]; // 飛鳥山動物病院
+
+// BRouter APIのURL生成
+function getBRouterUrl(start: number[], end: number[]): string {
+  return `https://brouter.de/brouter?lonlats=${start[1]},${start[0]}|${end[1]},${end[0]}&profile=fastbike&alternativeidx=0&format=geojson`;
+}
+
+window.onload = async () => {
+  const map = L.map('map').setView([
+    (OJI[0] + ASUKAYAMA_ANIMAL_HOSPITAL[0]) / 2,
+    (OJI[1] + ASUKAYAMA_ANIMAL_HOSPITAL[1]) / 2
+  ], 16);
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
@@ -49,5 +61,29 @@ window.onload = () => {
       e.preventDefault();
       originModal.style.display = 'none';
     });
+  }
+
+  // 王子駅・飛鳥山動物病院にマーカーを表示
+  L.marker(OJI as L.LatLngTuple).addTo(map).bindPopup('王子駅').openPopup();
+  L.marker(ASUKAYAMA_ANIMAL_HOSPITAL as L.LatLngTuple).addTo(map).bindPopup('飛鳥山動物病院');
+
+  // BRouter APIでルート取得
+  try {
+    const url = getBRouterUrl(OJI, ASUKAYAMA_ANIMAL_HOSPITAL);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('ルート取得失敗');
+    const geojson = await res.json();
+
+    // GeoJSONのルートを地図に表示
+    L.geoJSON(geojson, {
+      style: {
+        color: 'blue',
+        weight: 5,
+        opacity: 0.7
+      }
+    }).addTo(map);
+  } catch (e) {
+    alert('ルートの取得に失敗しました');
+    console.error(e);
   }
 };
