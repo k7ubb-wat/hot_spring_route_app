@@ -1,12 +1,21 @@
 'use strict';
 
+import { loadResource, getAvoidPoints } from './const';
+
 import L from 'leaflet';
 
 // BRouter APIのURL生成（坂道回避オプション追加）
 function getBRouterUrl(start: number[], end: number[], avoidHills: boolean): string {
   // profile: shortest（通常）/ trekking（坂道回避）
   const profile = avoidHills ? 'trekking' : 'shortest';
-  return `https://brouter.de/brouter?lonlats=${start[1]},${start[0]}|${end[1]},${end[0]}&profile=${profile}&alternativeidx=0&format=geojson`;
+  let avoidareas = '';
+  if (isFloodMap) {
+    const avoidPoints = getAvoidPoints();
+    if (avoidPoints && avoidPoints.length > 0) {
+      avoidareas = '&avoid=' + avoidPoints.map(pt => `${pt[1].toFixed(5)},${pt[0].toFixed(5)},100`).join('|');
+    }
+  }
+  return `https://brouter.de/brouter?lonlats=${start[1]},${start[0]}|${end[1]},${end[0]}&profile=${profile}&alternativeidx=0&format=geojson${avoidareas}`;
 }
 
 // MLIT 浸水マップタイルURL（全国洪水浸水想定区域図ラスタ例）
@@ -51,7 +60,9 @@ async function getLatLngByNominatim(query: string): Promise<[number, number] | n
   }
 }
 
-window.onload = () => {
+window.onload = async () => {
+  await loadResource();
+
   const map = L.map('map').setView([35.755532, 139.733945], 16);
 
   // 通常地図レイヤー
@@ -64,6 +75,24 @@ window.onload = () => {
     opacity: 0.7,
     attribution: '国土交通省 浸水マップ'
   });
+
+  // Layer group for avoid points markers
+  const avoidPointsLayer = L.layerGroup();
+
+  // Function to add avoid points markers
+  function addAvoidPointsMarkers() {
+    const avoidPoints = getAvoidPoints();
+    avoidPoints.forEach(([lat, lng]) => {
+      L.marker([lat, lng], {
+        icon: L.divIcon({
+          className: 'avoid-point-marker',
+          html: '❌',
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        })
+      }).addTo(avoidPointsLayer);
+    });
+  }
 
   // 現在地ピン管理用
   let currentLocationMarker: L.Marker | null = null;
@@ -107,10 +136,13 @@ window.onload = () => {
     floodBtn.addEventListener('click', () => {
       if (isFloodMap) {
         map.removeLayer(floodLayer!);
+        map.removeLayer(avoidPointsLayer);
         baseLayer.addTo(map);
         isFloodMap = false;
       } else {
         map.addLayer(floodLayer!);
+        addAvoidPointsMarkers();
+        map.addLayer(avoidPointsLayer);
         isFloodMap = true;
       }
     });
