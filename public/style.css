@@ -18,3 +18,18 @@ main {
   position: relative;
   overflow: hidden;
 }
+
+#hills-status {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1300;
+  padding: 8px 24px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #2563eb;
+}

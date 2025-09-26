@@ -24,22 +24,24 @@
       <span class="pointer-events-none">💧</span>
     </button>
 
+    <!-- 坂道回避切替ボタン -->
+    <button id="toggle-avoid-hills"
+      class="absolute top-[220px] right-3 z-[1200] w-10 h-10 rounded-full bg-green-500 text-white border-none shadow-md text-xl flex items-center justify-center cursor-pointer">
+      <span class="pointer-events-none">⛰️</span>
+    </button>
+
     <!-- ルート設定ボタン -->
     <button id="open-route-modal"
-      class="absolute top-5 left-1/2 -translate-x-1/2 z-[1200] px-8 py-3 rounded-lg bg-blue-600 text-white border-none shadow-md text-base cursor-pointer">
+      class="absolute top-15 left-1/2 -translate-x-1/2 z-[1200] px-8 py-3 rounded-lg bg-blue-600 text-white border-none shadow-md text-base cursor-pointer">
       ルート設定
     </button>
 
     <!-- 出発地・目的地入力画面（初期は非表示） -->
     <div id="route-modal"
-      class="hidden absolute top-[70px] left-1/2 -translate-x-1/2 bg-white/95 p-8 rounded-xl shadow-lg z-[1100] min-w-[320px]">
+      class="hidden absolute top-[110px] left-1/2 -translate-x-1/2 bg-white/95 p-8 rounded-xl shadow-lg z-[1100] min-w-[320px]">
       <form id="route-form" class="flex flex-col gap-4 items-center">
         <input type="text" id="origin-input" name="origin" placeholder="出発地を入力してください" class="w-[220px] p-2 border rounded">
         <input type="text" id="destination-input" name="destination" placeholder="目的地を入力してください" class="w-[220px] p-2 border rounded">
-        <label class="flex items-center gap-2">
-          <input type="checkbox" id="avoid-hills" name="avoid-hills">
-          坂道回避ルート
-        </label>
         <div class="flex gap-4">
           <button type="submit" class="px-6 py-2 min-w-[100px] bg-blue-600 text-white rounded">検索</button>
         </div>
