@@ -31,5 +31,56 @@ main {
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   font-weight: bold;
   font-size: 1.1em;
-  color: #2563eb;
+  color: #22c55e;
+}
+
+#toggle-flood-map,
+#toggle-avoid-hills,
+#goto-current-location,
+#open-route-modal {
+  transition: box-shadow 0.2s, filter 0.2s;
+}
+
+#toggle-flood-map:hover,
+#toggle-avoid-hills:hover,
+#goto-current-location:hover,
+#open-route-modal:hover {
+  box-shadow: 0 0 16px 4px rgba(33,150,243,0.25);
+  filter: brightness(1.15);
+}
+
+#open-route-modal {
+  background: #ddd6fe; /* tailwindのviolet-200 */
+  color: #6d28d9;
+  border: none;
+  border-radius: 8px;
+  box-shadow: none;
+  padding: 0.75em 2em;
+  font-size: 1.1em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+#open-route-modal:hover {
+  background: #c4b5fd; /* tailwindのviolet-300 */
+  color: #4c1d95;
+}
+
+#route-form button[type="submit"] {
+  background: #ddd6fe; /* tailwindのviolet-200 */
+  color: #6d28d9;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75em 2em;
+  font-size: 1.1em;
+  font-weight: bold;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+#route-form button[type="submit"]:hover {
+  background: #c4b5fd; /* tailwindのviolet-300 */
+  color: #4c1d95;
 }
