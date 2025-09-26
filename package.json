@@ -3,15 +3,19 @@
 	"version": "1.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "concurrently \"npm run watch\" \"npm run serve\"",
+		"dev": "concurrently \"npm run watch\" \"npm run serve\" \"npm run css:watch\"",
 		"serve": "http-server dist -p 3000 -a localhost",
 		"watch": "node build.js --dev",
-		"build": "node build.js",
+		"build": "concurrently \"npm run js:build\" \"npm run css:build\"",
 		"lint": "eslint .",
-		"lint:fix": "eslint . --fix"
+		"lint:fix": "eslint . --fix",
+		"js:build": "node build.js",
+		"css:build": "npx @tailwindcss/cli -i public/style.css -o dist/style.css",
+		"css:watch": "npx @tailwindcss/cli -i public/style.css -o dist/style.css --watch"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.36.0",
+		"@tailwindcss/cli": "^4.1.13",
 		"@types/leaflet": "^1.9.20",
 		"@types/node": "^24.5.2",
 		"concurrently": "^9.2.1",

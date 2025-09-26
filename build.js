@@ -11,7 +11,10 @@ const performBuild = async () => {
 		
 		await fs.ensureDir(distDir);
 		try {
-			await fs.copy(publicDir, distDir, { overwrite: true });
+			await fs.copy(publicDir, distDir, {
+				overwrite: true,
+				filter: (src) => !src.endsWith('style.css')
+			});
 		} catch (err) {
 			console.warn(`⚠️ Could not overwrite public files (ignored): ${err.message}`);
 		}
