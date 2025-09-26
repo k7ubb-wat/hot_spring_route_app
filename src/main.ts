@@ -152,17 +152,12 @@ window.onload = async () => {
     floodBtn.addEventListener('click', () => {
       if (isFloodMap) {
         map.removeLayer(floodLayer!);
-        map.removeLayer(avoidPointsLayer);
-        baseLayer.addTo(map);
+        floodBtn.classList.remove('active');
         isFloodMap = false;
-        updateHillsStatusDiv();
       } else {
         map.addLayer(floodLayer!);
-        addAvoidPointsMarkers();
-        map.addLayer(avoidPointsLayer);
+        floodBtn.classList.add('active');
         isFloodMap = true;
-        hillsStatusDiv.innerText = '浸水回避 ON';
-          hillsStatusDiv.style.color = '#ea4c31ff';
       }
     });
   }
@@ -193,8 +188,6 @@ window.onload = async () => {
     // 坂道回避切替ボタンの機能
     const avoidHillsBtn = document.getElementById('toggle-avoid-hills');
     if (avoidHillsBtn) {
-      // ボタンは⛰️のみ
-      avoidHillsBtn.innerHTML = '<span class="pointer-events-none">⛰️</span>';
       avoidHillsBtn.style.backgroundColor = '#22c55e';
 
       avoidHillsBtn.addEventListener('click', async () => {
