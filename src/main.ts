@@ -12,7 +12,7 @@ function getBRouterUrl(start: number[], end: number[], avoidHills: boolean): str
   if (isFloodMap) {
     const avoidPoints = getAvoidPoints();
     if (avoidPoints && avoidPoints.length > 0) {
-      avoidareas = '&avoid=' + avoidPoints.map(pt => `${pt[1].toFixed(5)},${pt[0].toFixed(5)},100`).join('|');
+      avoidareas = '&nogos=' + avoidPoints.map(pt => `${pt[1].toFixed(5)},${pt[0].toFixed(5)},400`).join('|');
     }
   }
   return `https://brouter.de/brouter?lonlats=${start[1]},${start[0]}|${end[1]},${end[0]}&profile=${profile}&alternativeidx=0&format=geojson${avoidareas}`;
