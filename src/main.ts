@@ -4,6 +4,20 @@ import { loadResource, getAvoidPoints } from './const';
 
 import L from 'leaflet';
 
+// 坂道回避状態を管理
+let avoidHills = false;
+
+function updateHillsStatusDiv() {
+  const hillsStatusDiv = document.getElementById('hills-status') as HTMLDivElement;
+  if (avoidHills) {
+    hillsStatusDiv.innerText = '坂道回避 ON';
+    hillsStatusDiv.style.color = '#2563eb';
+  } else {
+    hillsStatusDiv.innerText = '坂道回避 OFF';
+    hillsStatusDiv.style.color = '#22c55e';
+  }
+}
+
 // BRouter APIのURL生成（坂道回避オプション追加）
 function getBRouterUrl(start: number[], end: number[], avoidHills: boolean): string {
   // profile: shortest（通常）/ trekking（坂道回避）
@@ -141,11 +155,14 @@ window.onload = async () => {
         map.removeLayer(avoidPointsLayer);
         baseLayer.addTo(map);
         isFloodMap = false;
+        updateHillsStatusDiv();
       } else {
         map.addLayer(floodLayer!);
         addAvoidPointsMarkers();
         map.addLayer(avoidPointsLayer);
         isFloodMap = true;
+        hillsStatusDiv.innerText = '浸水回避 ON';
+          hillsStatusDiv.style.color = '#ea4c31ff';
       }
     });
   }
@@ -172,8 +189,6 @@ window.onload = async () => {
         }
       }
     });
-    // 坂道回避状態を管理
-    let avoidHills = false;
 
     // 坂道回避切替ボタンの機能
     const avoidHillsBtn = document.getElementById('toggle-avoid-hills');
@@ -184,16 +199,12 @@ window.onload = async () => {
 
       avoidHillsBtn.addEventListener('click', async () => {
         avoidHills = !avoidHills;
-        // 状態表示を更新
         if (avoidHills) {
-          hillsStatusDiv.innerText = '坂道回避 ON';
-          hillsStatusDiv.style.color = '#2563eb';
           avoidHillsBtn.style.backgroundColor = '#2563eb'; // ON:青
         } else {
-          hillsStatusDiv.innerText = '坂道回避 OFF';
-          hillsStatusDiv.style.color = '#22c55e';
           avoidHillsBtn.style.backgroundColor = '#22c55e'; // OFF:緑
         }
+        updateHillsStatusDiv();
         // 出発地・目的地が入力済みならルート再検索
         const originInput = document.getElementById('origin-input') as HTMLInputElement;
         const destinationInput = document.getElementById('destination-input') as HTMLInputElement;
