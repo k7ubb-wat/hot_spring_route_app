@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<title>title</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+<title>smooth flow</title>
 </head>
 <body>
   <main>
@@ -15,25 +16,25 @@
     <!-- 現在地に飛ぶボタン -->
     <button id="goto-current-location" title="現在地に移動"
       class="absolute top-[100px] right-3 z-[1200] w-10 h-10 rounded-full bg-blue-200 text-blue-800 border-none shadow-md text-xl flex items-center justify-center cursor-pointer">
-      <span class="pointer-events-none">📍</span>
+      <i class="fa-solid fa-location-arrow pointer-events-none"></i>
     </button>
 
     <!-- 浸水マップ切替ボタン -->
     <button id="toggle-flood-map"
       class="absolute top-[160px] right-3 z-[1200] w-10 h-10 rounded-full bg-red-400 text-white border-none shadow-md text-xl flex items-center justify-center cursor-pointer">
-      <span class="pointer-events-none">💧</span>
+      <i class="fa-solid fa-water pointer-events-none"></i>
     </button>
 
     <!-- 坂道回避切替ボタン -->
     <button id="toggle-avoid-hills"
       class="absolute top-[220px] right-3 z-[1200] w-10 h-10 rounded-full bg-green-500 text-white border-none shadow-md text-xl flex items-center justify-center cursor-pointer">
-      <span class="pointer-events-none">⛰️</span>
+      <i class="fa-solid fa-mountain pointer-events-none"></i>
     </button>
 
     <!-- ルート設定ボタン -->
     <button id="open-route-modal"
-      class="absolute top-15 left-1/2 -translate-x-1/2 z-[1200] px-8 py-3 rounded-lg bg-blue-600 text-white border-none shadow-md text-base cursor-pointer">
-      ルート設定
+      class="absolute top-15 left-1/2 -translate-x-1/2 z-[1200] px-8 py-3 rounded-lg bg-violet-200 text-gray-800 border-none shadow-md text-base cursor-pointer">
+      <i class="fa-solid fa-route mr-2"></i>ルート設定
     </button>
 
     <!-- 出発地・目的地入力画面（初期は非表示） -->
@@ -43,7 +44,9 @@
         <input type="text" id="origin-input" name="origin" placeholder="出発地を入力してください" class="w-[220px] p-2 border rounded">
         <input type="text" id="destination-input" name="destination" placeholder="目的地を入力してください" class="w-[220px] p-2 border rounded">
         <div class="flex gap-4">
-          <button type="submit" class="px-6 py-2 min-w-[100px] bg-blue-600 text-white rounded">検索</button>
+          <button type="submit" class="px-6 py-2 min-w-[100px] bg-violet-300 text-white rounded">
+            <i class="fa-solid fa-magnifying-glass mr-2"></i>検索
+          </button>
         </div>
       </form>
     </div>

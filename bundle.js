@@ -9585,8 +9585,19 @@ var getAvoidPoints = () => avoidPoints;
 
 // src/main.ts
 var import_leaflet = __toESM(require_leaflet_src(), 1);
-function getBRouterUrl(start, end, avoidHills) {
-  const profile = avoidHills ? "trekking" : "shortest";
+var avoidHills = false;
+function updateHillsStatusDiv() {
+  const hillsStatusDiv = document.getElementById("hills-status");
+  if (avoidHills) {
+    hillsStatusDiv.innerText = "\u5742\u9053\u56DE\u907F ON";
+    hillsStatusDiv.style.color = "#2563eb";
+  } else {
+    hillsStatusDiv.innerText = "\u5742\u9053\u56DE\u907F OFF";
+    hillsStatusDiv.style.color = "#22c55e";
+  }
+}
+function getBRouterUrl(start, end, avoidHills2) {
+  const profile = avoidHills2 ? "trekking" : "shortest";
   let avoidareas = "";
   if (isFloodMap) {
     const avoidPoints2 = getAvoidPoints();
@@ -9693,11 +9704,15 @@ window.onload = async () => {
         map.removeLayer(avoidPointsLayer);
         baseLayer.addTo(map);
         isFloodMap = false;
+        updateHillsStatusDiv();
       } else {
         map.addLayer(floodLayer);
         addAvoidPointsMarkers();
         map.addLayer(avoidPointsLayer);
+        floodBtn.classList.add("active");
         isFloodMap = true;
+        hillsStatusDiv.innerText = "\u6D78\u6C34\u56DE\u907F ON";
+        hillsStatusDiv.style.color = "#ea4c31ff";
       }
     });
   }
@@ -9720,22 +9735,17 @@ window.onload = async () => {
         }
       }
     });
-    let avoidHills = false;
     const avoidHillsBtn = document.getElementById("toggle-avoid-hills");
     if (avoidHillsBtn) {
-      avoidHillsBtn.innerHTML = '<span class="pointer-events-none">\u26F0\uFE0F</span>';
       avoidHillsBtn.style.backgroundColor = "#22c55e";
       avoidHillsBtn.addEventListener("click", async () => {
         avoidHills = !avoidHills;
         if (avoidHills) {
-          hillsStatusDiv.innerText = "\u5742\u9053\u56DE\u907F ON";
-          hillsStatusDiv.style.color = "#2563eb";
           avoidHillsBtn.style.backgroundColor = "#2563eb";
         } else {
-          hillsStatusDiv.innerText = "\u5742\u9053\u56DE\u907F OFF";
-          hillsStatusDiv.style.color = "#22c55e";
           avoidHillsBtn.style.backgroundColor = "#22c55e";
         }
+        updateHillsStatusDiv();
         const originInput2 = document.getElementById("origin-input");
         const destinationInput2 = document.getElementById("destination-input");
         const originText = originInput2?.value.trim();
