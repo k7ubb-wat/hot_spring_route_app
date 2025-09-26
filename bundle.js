@@ -9602,7 +9602,7 @@ function getBRouterUrl(start, end, avoidHills2) {
   if (isFloodMap) {
     const avoidPoints2 = getAvoidPoints();
     if (avoidPoints2 && avoidPoints2.length > 0) {
-      avoidareas = "&nogos=" + avoidPoints2.map((pt) => `${pt[1].toFixed(5)},${pt[0].toFixed(5)},400`).join("|");
+      avoidareas = "&nogos=" + avoidPoints2.map((pt) => `${pt[1].toFixed(5)},${pt[0].toFixed(5)},100`).join("|");
     }
   }
   return `https://brouter.de/brouter?lonlats=${start[1]},${start[0]}|${end[1]},${end[0]}&profile=${profile}&alternativeidx=0&format=geojson${avoidareas}`;
@@ -9724,8 +9724,6 @@ window.onload = async () => {
   if (openRouteModalBtn && routeModal && routeForm && originInput && destinationInput) {
     openRouteModalBtn.addEventListener("click", () => {
       routeModal.style.display = "block";
-      originInput.value = "";
-      destinationInput.value = "";
     });
     document.addEventListener("mousedown", (e) => {
       if (routeModal.style.display === "block") {
