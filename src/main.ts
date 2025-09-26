@@ -152,12 +152,21 @@ window.onload = async () => {
     floodBtn.addEventListener('click', () => {
       if (isFloodMap) {
         map.removeLayer(floodLayer!);
-        floodBtn.classList.remove('active');
+        map.removeLayer(avoidPointsLayer);
+        baseLayer.addTo(map);
         isFloodMap = false;
+        updateHillsStatusDiv();
+
       } else {
         map.addLayer(floodLayer!);
+        addAvoidPointsMarkers();
+        map.addLayer(avoidPointsLayer);
+
+
         floodBtn.classList.add('active');
         isFloodMap = true;
+        hillsStatusDiv.innerText = '浸水回避 ON';
+        hillsStatusDiv.style.color = '#ea4c31ff';
       }
     });
   }
@@ -169,7 +178,7 @@ window.onload = async () => {
   const originInput = document.getElementById('origin-input') as HTMLInputElement;
   const destinationInput = document.getElementById('destination-input') as HTMLInputElement;
 
-  if (openRouteModalBtn && routeModal && routeForm && originInput && destinationInput  ) {
+  if (openRouteModalBtn && routeModal && routeForm && originInput && destinationInput) {
     openRouteModalBtn.addEventListener('click', () => {
       routeModal.style.display = 'block';
       originInput.value = '';
@@ -274,7 +283,7 @@ window.onload = async () => {
   // 坂道回避状態表示用の要素を作成
   const hillsStatusDiv = document.createElement('div');
   hillsStatusDiv.id = 'hills-status';
- 
+
   hillsStatusDiv.innerText = '坂道回避 OFF';
   document.body.appendChild(hillsStatusDiv);
 };
